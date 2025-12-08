@@ -1,0 +1,3 @@
+int drawable fondo1 0x0
+int drawable inicio 0x0
+int drawable perrito 0x0
