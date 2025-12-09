@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cl.duoc.veterinaria.ui.R
 
@@ -27,6 +31,17 @@ import cl.duoc.veterinaria.ui.R
  */
 @Composable
 fun DuenoScreen(viewModel: RegistroViewModel, onNextClicked: () -> Unit) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    // Validaciones:
+    // 1. Nombre no vacío.
+    // 2. Teléfono no vacío y solo dígitos.
+    // 3. Email no vacío y con formato válido (contiene @).
+    val isTelefonoValido = uiState.duenoTelefono.isNotBlank() && uiState.duenoTelefono.all { it.isDigit() }
+    val isFormValid = uiState.duenoNombre.isNotBlank() && 
+                      isTelefonoValido && 
+                      uiState.duenoEmail.isNotBlank() && uiState.duenoEmail.contains("@")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,32 +63,44 @@ fun DuenoScreen(viewModel: RegistroViewModel, onNextClicked: () -> Unit) {
         
         // Campo de texto para el nombre del cliente.
         RegistroTextField(
-            value = viewModel.duenoNombre.value,
+            value = uiState.duenoNombre,
             label = "Nombre del cliente",
-            onValueChange = { viewModel.duenoNombre.value = it }
+            onValueChange = { viewModel.updateDuenoNombre(it) },
+            isError = uiState.duenoNombre.isBlank()
         )
         Spacer(modifier = Modifier.height(8.dp))
         
         // Campo de texto para el teléfono de contacto.
+        // Se restringe el teclado a numérico (Phone) y se valida que sean solo números.
         RegistroTextField(
-            value = viewModel.duenoTelefono.value,
-            label = "Teléfono de contacto",
-            onValueChange = { viewModel.duenoTelefono.value = it }
+            value = uiState.duenoTelefono,
+            label = "Teléfono de contacto (solo números)",
+            onValueChange = { 
+                // Opcional: Impedir ingreso de caracteres no numéricos directamente
+                if (it.all { char -> char.isDigit() }) {
+                    viewModel.updateDuenoTelefono(it) 
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            isError = !isTelefonoValido
         )
         Spacer(modifier = Modifier.height(8.dp))
         
         // Campo de texto para el email.
         RegistroTextField(
-            value = viewModel.duenoEmail.value,
+            value = uiState.duenoEmail,
             label = "Email (para recordatorios)",
-            onValueChange = { viewModel.duenoEmail.value = it }
+            onValueChange = { viewModel.updateDuenoEmail(it) },
+            isError = uiState.duenoEmail.isBlank() || !uiState.duenoEmail.contains("@"),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
         Spacer(modifier = Modifier.height(24.dp))
         
         // Botón para navegar a la siguiente pantalla.
         Button(
             onClick = onNextClicked,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = isFormValid // Se deshabilita si los campos no son válidos
         ) {
             Text("Siguiente")
         }

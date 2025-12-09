@@ -14,19 +14,22 @@ import androidx.compose.ui.Modifier
  * @param label La etiqueta a mostrar en el campo.
  * @param onValueChange La acción a ejecutar cuando el texto cambia.
  * @param keyboardOptions Opciones de teclado (por defecto vacío).
+ * @param isError Indica si el campo debe mostrarse en estado de error.
  */
 @Composable
 fun RegistroTextField(
     value: String,
     label: String,
     onValueChange: (String) -> Unit,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    isError: Boolean = false
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = keyboardOptions
+        keyboardOptions = keyboardOptions,
+        isError = isError
     )
 }

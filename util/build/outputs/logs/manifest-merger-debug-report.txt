@@ -1,16 +1,16 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml:2:13-83
-INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml:2:13-83
+ADDED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml:2:13-83
+INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml:2:13-83
 	package
-		INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml
+		INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml
 	xmlns:android
-		ADDED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml:2:23-81
+		ADDED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml:2:23-81
 uses-sdk
-INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml reason: use-sdk injection requested
-INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml
-INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml
+INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml reason: use-sdk injection requested
+INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml
+INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml
 	android:targetSdkVersion
-		INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml
+		INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml
 	android:minSdkVersion
-		INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Semana 5/EXP2_S5_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16040481424398010718.xml
+		INJECTED from /Users/lilianatapia/Documents/DUOC/DESARROLLO APP MOVILES I/Sumativa 2/EXP2_S6_Liliana_Tapia/VeterinariaApp/util/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest10746357642453389681.xml

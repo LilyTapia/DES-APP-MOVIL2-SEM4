@@ -39,7 +39,7 @@ fun ServicioScreen(viewModel: RegistroViewModel, onNextClicked: () -> Unit) {
             Button(
                 onClick = { 
                     // Actualiza el tipo de servicio en el ViewModel.
-                    viewModel.tipoServicio.value = servicio
+                    viewModel.updateTipoServicio(servicio)
                     // Navega a la siguiente pantalla.
                     onNextClicked()
                 },
