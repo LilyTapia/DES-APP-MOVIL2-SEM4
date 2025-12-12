@@ -1,4 +1,0 @@
-cl.duoc.veterinaria.ui
-drawable fondo1
-drawable inicio
-drawable perrito

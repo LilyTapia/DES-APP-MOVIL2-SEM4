@@ -60,11 +60,14 @@ dependencies {
     // Navigation + ViewModel
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    
+    // Coroutines & LiveData
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 
-    // 🔗 Módulos locales
-    implementation(project(":data"))
-    implementation(project(":ui"))
-    implementation(project(":util"))
+    // 🔗 Módulos locales eliminados (Fusionados en :app)
+    // implementation(project(":data"))
+    // implementation(project(":util"))
 
     // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

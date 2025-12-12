@@ -21,6 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "VeterinariaApp"
 include(":app")
-include(":data")
-include(":ui")
-include(":util")
