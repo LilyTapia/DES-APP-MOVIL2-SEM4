@@ -56,6 +56,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    
+    // Iconos Material extendidos (para Pets y otros iconos específicos)
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Navigation + ViewModel
     implementation("androidx.navigation:navigation-compose:2.7.7")
@@ -64,10 +67,6 @@ dependencies {
     // Coroutines & LiveData
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.livedata.ktx)
-
-    // 🔗 Módulos locales eliminados (Fusionados en :app)
-    // implementation(project(":data"))
-    // implementation(project(":util"))
 
     // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

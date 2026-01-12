@@ -14,29 +14,40 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.duoc.veterinaria.R
+import cl.duoc.veterinaria.ui.auth.LoginViewModel
 import cl.duoc.veterinaria.ui.viewmodel.RegistroViewModel
 import cl.duoc.veterinaria.util.ValidationUtils
 
-/**
- * DuenoScreen es el Composable para la pantalla donde se ingresan los datos del dueño de la mascota.
- *
- * @param viewModel El ViewModel que contiene el estado del formulario de registro.
- * @param onNextClicked La acción a ejecutar cuando se hace clic en el botón "Siguiente".
- */
 @Composable
-fun DuenoScreen(viewModel: RegistroViewModel, onNextClicked: () -> Unit) {
+fun DuenoScreen(
+    viewModel: RegistroViewModel, 
+    onNextClicked: () -> Unit,
+    loginViewModel: LoginViewModel = viewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
+    val loginState by loginViewModel.uiState.collectAsState()
+    
+    // Autocompleta el nombre si el usuario ya inició sesión
+    LaunchedEffect(loginState.currentUser) {
+        if (uiState.duenoNombre.isBlank() && loginState.currentUser != null) {
+            viewModel.updateDatosDueno(
+                nombre = loginState.currentUser!!.nombreUsuario,
+                email = loginState.currentUser!!.email
+            )
+        }
+    }
 
-    // Validaciones:
-    // Utilizando ValidationUtils para centralizar la lógica
     val isNombreValido = ValidationUtils.isValidNombre(uiState.duenoNombre)
     val isTelefonoValido = uiState.duenoTelefono.isNotBlank() && uiState.duenoTelefono.all { it.isDigit() }
     val isEmailValido = ValidationUtils.isValidEmail(uiState.duenoEmail)
@@ -46,64 +57,76 @@ fun DuenoScreen(viewModel: RegistroViewModel, onNextClicked: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Muestra una imagen en la parte superior de la pantalla.
+        Spacer(modifier = Modifier.height(20.dp))
+        
         Image(
             painter = painterResource(id = R.drawable.perrito),
-            contentDescription = "Logo Veterinaria",
-            modifier = Modifier.size(120.dp)
+            contentDescription = null,
+            modifier = Modifier.size(100.dp)
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
-        // Título de la pantalla.
-        Text("Datos del Dueño", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         
-        // Campo de texto para el nombre del cliente.
+        Text(
+            text = "Información de Contacto", 
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        
+        Text(
+            text = "Confirme sus datos para avisos sobre su mascota", 
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+        
         RegistroTextField(
             value = uiState.duenoNombre,
-            label = "Nombre del cliente",
+            label = "Nombre del responsable",
             onValueChange = { viewModel.updateDatosDueno(nombre = it) },
-            isError = !isNombreValido && uiState.duenoNombre.isNotBlank() // Mostrar error si no es válido y no está vacío
+            isError = !isNombreValido && uiState.duenoNombre.isNotBlank(),
+            errorMessage = "Nombre obligatorio"
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
-        // Campo de texto para el teléfono de contacto.
-        // Se restringe el teclado a numérico (Phone) y se valida que sean solo números.
         RegistroTextField(
             value = uiState.duenoTelefono,
-            label = "Teléfono de contacto (solo números)",
+            label = "Teléfono de contacto (urgencias)",
             onValueChange = { 
-                // Opcional: Impedir ingreso de caracteres no numéricos directamente
                 if (it.all { char -> char.isDigit() }) {
                     viewModel.updateDatosDueno(telefono = it) 
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            isError = !isTelefonoValido && uiState.duenoTelefono.isNotBlank()
+            isError = !isTelefonoValido && uiState.duenoTelefono.isNotBlank(),
+            errorMessage = "Ingrese un número válido"
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
-        // Campo de texto para el email.
         RegistroTextField(
             value = uiState.duenoEmail,
-            label = "Email (para recordatorios)",
+            label = "Correo electrónico para reportes",
             onValueChange = { viewModel.updateDatosDueno(email = it) },
             isError = !isEmailValido && uiState.duenoEmail.isNotBlank(),
+            errorMessage = "Email inválido",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
-        Spacer(modifier = Modifier.height(24.dp))
         
-        // Botón para navegar a la siguiente pantalla.
+        Spacer(modifier = Modifier.weight(1f))
+        
         Button(
             onClick = onNextClicked,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = isFormValid // Se deshabilita si los campos no son válidos
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            enabled = isFormValid
         ) {
-            Text("Siguiente")
+            Text("Continuar a datos de mascota", fontWeight = FontWeight.SemiBold)
         }
+        
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

@@ -3,17 +3,19 @@ package cl.duoc.veterinaria.ui.navigation
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cl.duoc.veterinaria.ui.auth.LoginScreen
+import cl.duoc.veterinaria.ui.auth.LoginViewModel
 import cl.duoc.veterinaria.ui.registro.DuenoScreen
 import cl.duoc.veterinaria.ui.registro.MascotaScreen
 import cl.duoc.veterinaria.ui.registro.ResumenScreen
 import cl.duoc.veterinaria.ui.registro.ServicioScreen
+import cl.duoc.veterinaria.ui.screens.AtencionesDuenoScreen
 import cl.duoc.veterinaria.ui.screens.BienvenidaScreen
 import cl.duoc.veterinaria.ui.screens.ListadoScreen
 import cl.duoc.veterinaria.ui.screens.PedidoScreen
@@ -24,19 +26,22 @@ import cl.duoc.veterinaria.ui.viewmodel.RegistroViewModel
 @Composable
 fun NavGraph() {
     val navController = rememberNavController()
+    
+    // Instancias únicas compartidas en todo el grafo
+    val loginViewModel: LoginViewModel = viewModel()
     val registroViewModel: RegistroViewModel = viewModel()
-    val (isLoggedIn, setLoggedIn) = remember { mutableStateOf(false) }
+    
+    val loginUiState by loginViewModel.uiState.collectAsState()
 
-    if (!isLoggedIn) {
-        LoginScreen(onLoginSuccess = { setLoggedIn(true) })
+    if (!loginUiState.isLoggedIn) {
+        // Pasamos el loginViewModel para que el login afecte al estado global
+        LoginScreen(loginViewModel = loginViewModel, onLoginSuccess = { })
     } else {
         NavHost(
             navController = navController,
             startDestination = "bienvenida_screen",
             enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() },
-            popEnterTransition = { fadeIn() },
-            popExitTransition = { fadeOut() }
+            exitTransition = { fadeOut() }
         ) {
             composable("bienvenida_screen") {
                 val mainViewModel: MainViewModel = viewModel()
@@ -45,13 +50,17 @@ fun NavGraph() {
                     onNavigateToRegistro = { navController.navigate("dueno_screen") },
                     onNavigateToListado = { navController.navigate("listado_screen") },
                     onNavigateToPedidos = { navController.navigate("pedidos_screen") },
-                    viewModel = mainViewModel
+                    onNavigateToMisAtenciones = { navController.navigate("mis_atenciones_screen") },
+                    viewModel = mainViewModel,
+                    loginViewModel = loginViewModel // Pasamos la misma instancia
                 )
             }
             composable("dueno_screen") {
-                DuenoScreen(viewModel = registroViewModel, onNextClicked = {
-                    navController.navigate("mascota_screen")
-                })
+                DuenoScreen(
+                    viewModel = registroViewModel, 
+                    loginViewModel = loginViewModel, // Pasamos la misma instancia para precargar datos
+                    onNextClicked = { navController.navigate("mascota_screen") }
+                )
             }
             composable("mascota_screen") {
                 MascotaScreen(viewModel = registroViewModel, onNextClicked = {
@@ -80,6 +89,16 @@ fun NavGraph() {
             composable("listado_screen") {
                 val consultaViewModel: ConsultaViewModel = viewModel()
                 ListadoScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigateToRegistro = { navController.navigate("dueno_screen") },
+                    viewModel = consultaViewModel
+                )
+            }
+            composable("mis_atenciones_screen") {
+                val consultaViewModel: ConsultaViewModel = viewModel()
+                val currentUser = loginUiState.currentUser
+                AtencionesDuenoScreen(
+                    duenoNombre = currentUser?.nombreUsuario ?: "Invitado",
                     onBack = { navController.popBackStack() },
                     viewModel = consultaViewModel
                 )

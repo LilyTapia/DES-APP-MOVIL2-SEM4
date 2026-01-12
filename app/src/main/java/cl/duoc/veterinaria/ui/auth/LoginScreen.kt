@@ -1,5 +1,6 @@
 package cl.duoc.veterinaria.ui.auth
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -22,8 +24,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.duoc.veterinaria.R
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
-    val loginViewModel: LoginViewModel = viewModel()
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    loginViewModel: LoginViewModel = viewModel()
+) {
     val uiState by loginViewModel.uiState.collectAsState()
     var showForgotPasswordDialog by remember { mutableStateOf(false) }
 
@@ -43,72 +47,113 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(16.dp),
+            .background(MaterialTheme.colorScheme.background)
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.login),
+            painter = painterResource(id = R.drawable.logoinicial), // Usamos el logo consistente
             contentDescription = "Logo Veterinaria",
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(150.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Sistema Veterinaria", style = MaterialTheme.typography.headlineLarge)
-        Text("Inicio de Sesión", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedTextField(
-            value = uiState.user,
-            onValueChange = { loginViewModel.onLoginChange(it, uiState.pass) },
-            label = { Text("Usuario o Email") },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            isError = uiState.userError != null || uiState.loginError != null,
-            supportingText = { uiState.userError?.let { Text(it) } },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = uiState.pass,
-            onValueChange = { loginViewModel.onLoginChange(uiState.user, it) },
-            label = { Text("Contraseña") },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            isError = uiState.passError != null || uiState.loginError != null,
-            supportingText = { uiState.passError?.let { Text(it) } },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "¿Olvidaste tu contraseña?",
-            modifier = Modifier
-                .clickable { showForgotPasswordDialog = true }
-                .align(Alignment.End),
-            style = MaterialTheme.typography.bodySmall
+            text = if (uiState.isRegisterMode) "Crear Cuenta" else "Bienvenido",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
         )
+        
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+        AnimatedContent(targetState = uiState.isRegisterMode, label = "auth_mode") { isRegister ->
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (isRegister) {
+                    // Campos de Registro
+                    OutlinedTextField(
+                        value = uiState.registerNombre,
+                        onValueChange = { loginViewModel.onRegisterDataChange(it, uiState.registerEmail, uiState.registerPass) },
+                        label = { Text("Nombre de usuario") },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = uiState.registerEmail,
+                        onValueChange = { loginViewModel.onRegisterDataChange(uiState.registerNombre, it, uiState.registerPass) },
+                        label = { Text("Correo electrónico") },
+                        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+                } else {
+                    // Campos de Login
+                    OutlinedTextField(
+                        value = uiState.user,
+                        onValueChange = { loginViewModel.onLoginChange(it, uiState.pass) },
+                        label = { Text("Usuario o Email") },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        isError = uiState.loginError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
 
-        uiState.loginError?.let {
+                OutlinedTextField(
+                    value = if (isRegister) uiState.registerPass else uiState.pass,
+                    onValueChange = { 
+                        if (isRegister) loginViewModel.onRegisterDataChange(uiState.registerNombre, uiState.registerEmail, it)
+                        else loginViewModel.onLoginChange(uiState.user, it)
+                    },
+                    label = { Text("Contraseña") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            }
+        }
+
+        if (!uiState.isRegisterMode) {
             Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                text = "¿Olvidaste tu contraseña?",
+                modifier = Modifier
+                    .clickable { showForgotPasswordDialog = true }
+                    .padding(vertical = 8.dp)
+                    .align(Alignment.End),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        val errorText = if (uiState.isRegisterMode) uiState.registerError else uiState.loginError
+        errorText?.let {
+            Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(bottom = 16.dp))
         }
 
         Button(
-            onClick = { loginViewModel.login() },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = uiState.user.isNotBlank() && uiState.pass.isNotBlank()
+            onClick = { if (uiState.isRegisterMode) loginViewModel.register() else loginViewModel.login() },
+            modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
-            Text("INICIAR SESIÓN")
+            Text(if (uiState.isRegisterMode) "REGISTRARSE" else "INICIAR SESIÓN")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = { loginViewModel.toggleAuthMode() }) {
+            Text(
+                if (uiState.isRegisterMode) "¿Ya tienes cuenta? Inicia sesión" 
+                else "¿No tienes cuenta? Regístrate aquí"
+            )
         }
     }
 }
@@ -127,21 +172,19 @@ fun RecoveryDialog(
             Column {
                 when (uiState.recoveryStatus) {
                     RecoveryStatus.SUCCESS -> {
-                        Text("Se ha enviado un enlace de recuperación a '${uiState.recoveryEmail}'. Cierra este diálogo.")
+                        Text("Se ha enviado un enlace a '${uiState.recoveryEmail}'.")
                     }
                     RecoveryStatus.ERROR -> {
-                        Text("El correo '${uiState.recoveryEmail}' no está registrado. Por favor, inténtalo de nuevo.")
+                        Text("El correo no está registrado.")
                     }
                     RecoveryStatus.IDLE -> {
-                        Text("Ingresa tu correo electrónico para enviarte un enlace de recuperación.")
+                        Text("Ingresa tu email para recuperar el acceso.")
                         Spacer(modifier = Modifier.height(16.dp))
                         OutlinedTextField(
                             value = uiState.recoveryEmail,
                             onValueChange = onEmailChange,
                             label = { Text("Email") },
                             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                            isError = uiState.recoveryEmailError != null,
-                            supportingText = { uiState.recoveryEmailError?.let { Text(it) } },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -150,15 +193,11 @@ fun RecoveryDialog(
         },
         confirmButton = {
             if (uiState.recoveryStatus == RecoveryStatus.IDLE) {
-                Button(onClick = onRecoverClick) {
-                    Text("Enviar")
-                }
+                Button(onClick = onRecoverClick) { Text("Enviar") }
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text(if (uiState.recoveryStatus == RecoveryStatus.IDLE) "Cancelar" else "Cerrar")
-            }
+            TextButton(onClick = onDismiss) { Text("Cerrar") }
         }
     )
 }
