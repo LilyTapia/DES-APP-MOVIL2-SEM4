@@ -5,6 +5,13 @@
 
 ---
 
+## 📄 Documentación Técnica
+Puedes revisar el informe detallado con la documentación técnica y funcional del proyecto en el siguiente enlace:
+
+👉 **[Ver Informe de Documentación (PDF)](./Documentaci%C3%B3n/Informe%20documentaci%C3%B3n%20t%C3%A9cnica%20b%C3%A1sica.pdf)**
+
+---
+
 ## 🛠️ Pilares Tecnológicos y Arquitectura
 
 ### 1. Arquitectura y Patrones
