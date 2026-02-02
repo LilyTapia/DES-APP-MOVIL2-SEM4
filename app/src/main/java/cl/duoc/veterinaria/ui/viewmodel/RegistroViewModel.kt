@@ -1,5 +1,6 @@
 package cl.duoc.veterinaria.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.duoc.veterinaria.data.IVeterinariaRepository
@@ -36,6 +37,8 @@ import java.time.format.DateTimeFormatter
 class RegistroViewModel(
     private val repository: IVeterinariaRepository = VeterinariaRepository
 ) : ViewModel() {
+
+    private val TAG = "RegistroViewModel"
 
     private val _uiState = MutableStateFlow(RegistroUiState())
     val uiState: StateFlow<RegistroUiState> = _uiState.asStateFlow()
@@ -107,75 +110,95 @@ class RegistroViewModel(
 
     fun procesarRegistro() {
         val currentState = _uiState.value
-        if (currentState.consultaRegistrada != null || _serviceState.value is ServiceState.Running) return
+        if (currentState.consultaRegistrada != null || _serviceState.value is ServiceState.Running) {
+            Log.w(TAG, "Proceso de registro ya en curso o ya completado.")
+            return
+        }
 
         viewModelScope.launch {
-            _serviceState.value = ServiceState.Running("Calculando costos...")
-            delay(1500)
-            _serviceState.value = ServiceState.Running("Confirmando reserva y pedido...")
-            delay(1500)
+            try {
+                Log.d(TAG, "Iniciando procesarRegistro...")
+                
+                _serviceState.value = ServiceState.Running("Calculando costos...")
+                delay(1500)
+                
+                Log.d(TAG, "Confirmando reserva y pedido...")
+                _serviceState.value = ServiceState.Running("Confirmando reserva y pedido...")
+                delay(1500)
 
-            val nombreCliente = if (currentState.duenoNombre.isBlank()) "Venta Mostrador" else currentState.duenoNombre
-            val esSoloFarmacia = currentState.mascotaNombre.isBlank()
+                val nombreCliente = if (currentState.duenoNombre.isBlank()) "Venta Mostrador" else currentState.duenoNombre
+                val esSoloFarmacia = currentState.mascotaNombre.isBlank()
 
-            val nuevoPedido = if (currentState.carrito.isNotEmpty()) {
-                Pedido(Cliente(nombreCliente, "", ""), currentState.carrito)
-            } else null
+                Log.d(TAG, "Cliente: $nombreCliente, Es solo farmacia: $esSoloFarmacia")
 
-            if (nuevoPedido != null) {
-                val itemsTexto = nuevoPedido.detalles.joinToString { "${it.medicamento.nombre} x${it.cantidad}" }
-                val fechaActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM HH:mm"))
-                repository.registrarPedidoRoom(
-                    PedidoEntity(duenoNombre = nombreCliente, items = itemsTexto, total = nuevoPedido.total, fecha = fechaActual, esCompraDirecta = esSoloFarmacia)
-                )
+                val nuevoPedido = if (currentState.carrito.isNotEmpty()) {
+                    Pedido(Cliente(nombreCliente, "", ""), currentState.carrito)
+                } else null
+
+                if (nuevoPedido != null) {
+                    Log.d(TAG, "Registrando pedido en Room...")
+                    val itemsTexto = nuevoPedido.detalles.joinToString { "${it.medicamento.nombre} x${it.cantidad}" }
+                    val fechaActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM HH:mm"))
+                    repository.registrarPedidoRoom(
+                        PedidoEntity(duenoNombre = nombreCliente, items = itemsTexto, total = nuevoPedido.total, fecha = fechaActual, esCompraDirecta = esSoloFarmacia)
+                    )
+                }
+
+                var consultaFinal: Consulta? = null
+
+                if (!esSoloFarmacia) {
+                    Log.d(TAG, "Registrando atención veterinaria...")
+                    // Obtener consultas existentes para evitar choques
+                    val consultasExistentes = repository.consultasLocal.first()
+                    
+                    // Buscar siguiente disponibilidad real
+                    val (veterinarioAsignado, fechaHoraReal) = AgendaVeterinario.buscarSiguienteDisponible(
+                        consultasExistentes, 
+                        Clock.systemDefaultZone()
+                    )
+                    
+                    val fechaHoraFormateada = AgendaVeterinario.fmt(fechaHoraReal)
+                    val servicio = currentState.tipoServicio ?: TipoServicio.CONTROL
+                    val costoConsulta = ConsultaService.calcularCostoBase(servicio, 30)
+                    val idCita = "AGENDA-" + (1000..9999).random()
+
+                    Log.d(TAG, "Asignando cita: $idCita con ${veterinarioAsignado.nombre} a las $fechaHoraFormateada")
+
+                    repository.registrarAtencion(
+                        nombreDueno = nombreCliente,
+                        cantidadMascotas = 1,
+                        nombreMascota = currentState.mascotaNombre,
+                        especieMascota = currentState.mascotaEspecie,
+                        tipoServicio = servicio.descripcion,
+                        edad = currentState.mascotaEdad.toIntOrNull() ?: 0,
+                        peso = currentState.mascotaPeso.toDoubleOrNull() ?: 0.0,
+                        consultaId = idCita,
+                        fechaHora = fechaHoraFormateada,
+                        veterinario = veterinarioAsignado.nombre,
+                        costo = costoConsulta
+                    )
+                    
+                    consultaFinal = Consulta(
+                        idConsulta = idCita,
+                        descripcion = "Atención de ${servicio.descripcion}",
+                        costoConsulta = costoConsulta,
+                        fechaAtencion = fechaHoraReal,
+                        veterinarioAsignado = Veterinario(veterinarioAsignado.nombre, "")
+                    )
+                }
+
+                _uiState.update { it.copy(
+                    consultaRegistrada = consultaFinal,
+                    pedidoRegistrado = nuevoPedido,
+                    notificacionAutomaticaMostrada = true
+                ) }
+                _serviceState.value = ServiceState.Stopped
+                Log.i(TAG, "Registro procesado exitosamente.")
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error durante el procesamiento del registro: ${e.message}", e)
+                _serviceState.value = ServiceState.Error("Error al procesar el registro. Intente nuevamente.")
             }
-
-            var consultaFinal: Consulta? = null
-
-            if (!esSoloFarmacia) {
-                // Obtener consultas existentes para evitar choques
-                val consultasExistentes = repository.consultasLocal.first()
-                
-                // Buscar siguiente disponibilidad real
-                val (veterinarioAsignado, fechaHoraReal) = AgendaVeterinario.buscarSiguienteDisponible(
-                    consultasExistentes, 
-                    Clock.systemDefaultZone()
-                )
-                
-                val fechaHoraFormateada = AgendaVeterinario.fmt(fechaHoraReal)
-                val servicio = currentState.tipoServicio ?: TipoServicio.CONTROL
-                val costoConsulta = ConsultaService.calcularCostoBase(servicio, 30)
-                val idCita = "AGENDA-" + (1000..9999).random()
-
-                repository.registrarAtencion(
-                    nombreDueno = nombreCliente,
-                    cantidadMascotas = 1,
-                    nombreMascota = currentState.mascotaNombre,
-                    especieMascota = currentState.mascotaEspecie,
-                    tipoServicio = servicio.descripcion,
-                    edad = currentState.mascotaEdad.toIntOrNull() ?: 0,
-                    peso = currentState.mascotaPeso.toDoubleOrNull() ?: 0.0,
-                    consultaId = idCita,
-                    fechaHora = fechaHoraFormateada,
-                    veterinario = veterinarioAsignado.nombre,
-                    costo = costoConsulta
-                )
-                
-                consultaFinal = Consulta(
-                    idConsulta = idCita,
-                    descripcion = "Atención de ${servicio.descripcion}",
-                    costoConsulta = costoConsulta,
-                    fechaAtencion = fechaHoraReal,
-                    veterinarioAsignado = Veterinario(veterinarioAsignado.nombre, "")
-                )
-            }
-
-            _uiState.update { it.copy(
-                consultaRegistrada = consultaFinal,
-                pedidoRegistrado = nuevoPedido,
-                notificacionAutomaticaMostrada = true
-            ) }
-            _serviceState.value = ServiceState.Stopped
         }
     }
 

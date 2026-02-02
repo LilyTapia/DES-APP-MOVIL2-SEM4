@@ -10,21 +10,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import cl.duoc.veterinaria.service.NotificacionService
 import cl.duoc.veterinaria.ui.navigation.NavGraph
 import cl.duoc.veterinaria.ui.theme.VeterinariaAppTheme
 import cl.duoc.veterinaria.ui.viewmodel.MainViewModel
 
-/**
- * MainActivity es la actividad principal y el punto de entrada de la aplicación.
- */
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
@@ -47,12 +40,8 @@ class MainActivity : ComponentActivity() {
             val isDarkMode by mainViewModel.isDarkMode.collectAsState()
             
             VeterinariaAppTheme(darkTheme = isDarkMode) {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    androidx.compose.foundation.layout.Box(modifier = Modifier.padding(innerPadding)) {
-                        // PASAMOS el mainViewModel para que toda la app use la misma instancia del tema
-                        NavGraph(mainViewModel = mainViewModel)
-                    }
-                }
+                // Se eliminó el Scaffold externo que causaba el doble espacio arriba
+                NavGraph(mainViewModel = mainViewModel)
             }
         }
     }

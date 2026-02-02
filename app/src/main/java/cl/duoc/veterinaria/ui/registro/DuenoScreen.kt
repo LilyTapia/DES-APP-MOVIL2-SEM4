@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,8 +39,8 @@ fun DuenoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val loginState by loginViewModel.uiState.collectAsState()
+    val scrollState = rememberScrollState()
     
-    // CORRECCIÓN: Autocompleta SIEMPRE con el usuario que tiene la sesión iniciada
     LaunchedEffect(loginState.currentUser) {
         val user = loginState.currentUser
         if (user != null) {
@@ -58,16 +60,15 @@ fun DuenoScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Top,
+            .padding(24.dp)
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.Center, // Centra el contenido verticalmente
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        
         Image(
             painter = painterResource(id = R.drawable.perrito),
             contentDescription = null,
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(180.dp) // Perrito más grande
         )
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -83,7 +84,7 @@ fun DuenoScreen(
             text = "Confirme sus datos para avisos sobre su mascota", 
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(bottom = 32.dp)
+            modifier = Modifier.padding(bottom = 24.dp)
         )
         
         RegistroTextField(
@@ -93,7 +94,7 @@ fun DuenoScreen(
             isError = !isNombreValido && uiState.duenoNombre.isNotBlank(),
             errorMessage = "Nombre obligatorio"
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         
         RegistroTextField(
             value = uiState.duenoTelefono,
@@ -107,7 +108,7 @@ fun DuenoScreen(
             isError = !isTelefonoValido && uiState.duenoTelefono.isNotBlank(),
             errorMessage = "Ingrese un número válido"
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         
         RegistroTextField(
             value = uiState.duenoEmail,
@@ -118,7 +119,7 @@ fun DuenoScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
         
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(32.dp))
         
         Button(
             onClick = onNextClicked,
@@ -127,7 +128,5 @@ fun DuenoScreen(
         ) {
             Text("Continuar a datos de mascota", fontWeight = FontWeight.SemiBold)
         }
-        
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }

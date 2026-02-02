@@ -76,7 +76,6 @@ fun BienvenidaScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    // Botón de Modo Oscuro en el Menú
                     IconButton(onClick = { viewModel.toggleDarkMode() }) {
                         Icon(
                             imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
@@ -170,6 +169,7 @@ fun BienvenidaScreen(
     ) {
         Scaffold(
             topBar = {
+                // La TopAppBar se mantiene arriba, aprovechando el espacio
                 TopAppBar(
                     title = { Text("VeterinariaApp") },
                     navigationIcon = {
@@ -196,7 +196,7 @@ fun BienvenidaScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(24.dp),
+                        .padding(24.dp), // Volvemos al padding original
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AnimatedVisibility(
@@ -214,15 +214,15 @@ fun BienvenidaScreen(
                                 color = MaterialTheme.colorScheme.primary
                             )
                             
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp)) // Restaurado a 16
 
                             Image(
                                 painter = painterResource(id = R.drawable.logoinicial),
                                 contentDescription = "Logo",
-                                modifier = Modifier.size(150.dp)
+                                modifier = Modifier.size(150.dp) // Restaurado a 150dp
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp)) // Restaurado a 16
 
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -235,7 +235,7 @@ fun BienvenidaScreen(
                                 ) {
                                     Text(
                                         text = "Estado del Día",
-                                        style = MaterialTheme.typography.titleLarge,
+                                        style = MaterialTheme.typography.titleLarge, // Restaurado a titleLarge
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.secondary
                                     )
@@ -271,22 +271,22 @@ fun BienvenidaScreen(
                             Spacer(modifier = Modifier.weight(1f))
 
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Button(
                                     onClick = onNavigateToAgenda,
-                                    modifier = Modifier.weight(1f).height(50.dp),
+                                    modifier = Modifier.weight(1f).height(56.dp), // Restaurado a 56dp
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                                 ) {
-                                    Text("Ver Agenda", fontSize = 14.sp)
+                                    Text("Ver Agenda", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                 }
                                 Button(
                                     onClick = onNavigateToNext,
-                                    modifier = Modifier.weight(1f).height(50.dp),
+                                    modifier = Modifier.weight(1f).height(56.dp), // Restaurado a 56dp
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                 ) {
-                                    Text("Nuevo Registro", fontSize = 14.sp)
+                                    Text("Nuevo Registro", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -302,13 +302,13 @@ fun SummaryItem(icon: ImageVector, label: String, value: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 24.dp)
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 24.dp) // Restaurado padding
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-            Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold) // Restaurado a bodyMedium
         }
     }
 }
