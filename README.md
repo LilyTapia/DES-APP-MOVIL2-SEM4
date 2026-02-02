@@ -8,10 +8,10 @@
 ## 📄 Documentación de la Actividad (Semana 4)
 Puedes revisar el informe detallado con las evidencias de depuración, uso de Logcat, Debugger y Profiler en el siguiente enlace:
 
-👉 **[Ver Informe de Diagnóstico y Optimización (PDF)](./Documentacio%CC%81n/Liliana_Tapia_Diagnosticando%20errores%20y%20optimizando%20el%20rendimiento_S4.pdf)**
+👉 **[Ver Informe de Diagnóstico y Optimización (PDF)](./Documentación/Liliana_Tapia_Diagnosticando%20errores%20y%20optimizando%20el%20rendimiento_S4.pdf)**
 
 *También puedes encontrar la documentación técnica general aquí:*
-👉 **[Ver Informe de Documentación Técnica Básica (PDF)](./Documentacio%CC%81n/Informe%20documentaci%C3%B3n%20t%C3%A9cnica%20b%C3%A1sica.pdf)**
+👉 **[Ver Informe de Documentación Técnica Básica (PDF)](./Documentación/Informe%20documentación%20técnica%20básica.pdf)**
 
 ---
 
